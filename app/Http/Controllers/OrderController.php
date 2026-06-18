@@ -1,0 +1,73 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\DTOs\OrderDTO;
+use App\Http\Requests\StoreOrderRequest;
+use App\Jobs\SendOrderNotification;
+use App\Models\City;
+use App\Models\Product;
+use App\Services\CityService;
+use App\Services\OrderService;
+
+class OrderController extends Controller
+{
+    public function __construct(private OrderService $orderService)
+    {
+    }
+
+    public function create()
+    {
+        $mainProduct = Product::query()
+            ->where('type', 'main')
+            ->where('status', true)
+            ->first();
+
+        $addOns = Product::query()
+            ->where('type', 'add_on')
+            ->where('status', true)
+            ->get();
+
+        $provinces = CityService::provinces();
+
+        $allCities = City::orderBy('title')
+            ->get()
+            ->groupBy('parent')
+            ->map(fn($cities) => $cities->values()->toArray());
+
+        return view('checkout.index', compact('mainProduct', 'addOns', 'provinces', 'allCities'));
+    }
+
+    public function store(StoreOrderRequest $request)
+    {
+        $product = Product::findOrFail($request->prd_id);
+
+        // آپلود تصاویر
+        $images = $this->orderService->uploadImages($request->file('images', []));
+
+        // مکمل‌ها
+        [$addons, $addonsTotal] = $this->orderService->buildAddons(
+            $request->input('addons', [])
+        );
+
+        // DTO
+        $dto = OrderDTO::fromRequest($request, $addons, $images);
+
+        // جمع کل
+        $totalPrice = ($product->price * $dto->productQty) + $addonsTotal;
+        $orderCode = $this->orderService->generateOrderCode();
+
+        // ثبت سفارش
+        $order = $this->orderService->createOrder($dto, $product, $totalPrice, $orderCode);
+
+        // dispatch
+        SendOrderNotification::dispatch($order, $addons, $images, $product->name);
+
+        return back()->with([
+            'success' => true,
+            'order_id' => $orderCode,
+            'order_total' => $totalPrice,
+            'order_date' => \Hekmatinasser\Verta\Verta::now()->format('j F Y'),
+        ]);
+    }
+}
