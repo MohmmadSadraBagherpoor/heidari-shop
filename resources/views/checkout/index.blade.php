@@ -1929,6 +1929,17 @@
     //          زده شد، hidden inputها را پر کرده و فرم سابمیت میشه
     // ======================================================
     function nextStep() {
+
+        // ← ریست input addon هایی که رد شدن
+        if (currentStep === 1 && stepStructure[1].currentSub > 1) {
+            const addonIndex = stepStructure[1].currentSub - 2;
+            const addon = subProducts[addonIndex];
+            if (addon && addon.qty === 0) {
+                const input = document.getElementById(`sub-qty-${addon.id}`);
+                if (input) input.value = 0;
+            }
+        }
+
         if (currentStep === 1 && stepStructure[1].currentSub === 1) {
             const qty = document.getElementById('qty').value;
             if (!qty || parseInt(qty) < 1) {
@@ -1938,6 +1949,7 @@
             }
             document.getElementById('qty').classList.remove('input-error');
         }
+
         if (currentStep === 2 && !validateStep2()) return;
         if (currentStep === 3 && !validateStep3()) return;
 
@@ -1958,7 +1970,6 @@
                 updateFormUI();
                 window.scrollTo({top: 0, behavior: 'smooth'});
             } else {
-                // استپ ۵ - ثبت نهایی: پر کردن hidden inputها و سابمیت فرم
                 document.getElementById('hidden-full-name').value =
                     document.getElementById('confirm-fullname').value;
 
@@ -1983,16 +1994,13 @@
                         : '';
 
                 if (selectedFiles.length === 0) {
-
                     imageError.style.display = 'block';
-
                     return;
                 }
 
                 showSuccessToast('در حال ثبت سفارش و آپلود فیش...');
 
                 const submitBtn = document.getElementById('btn-next');
-
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = 'در حال ارسال...';
 

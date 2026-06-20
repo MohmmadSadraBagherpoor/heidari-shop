@@ -42,6 +42,7 @@ return [
     'bale' => [
         'token' => env('BALE_BOT_TOKEN'),
         'chat_id' => env('BALE_CHAT_ID'),
+        'confirmed_chat_id' => env('BALE_CONFIRMED_CHAT_ID'),
     ],
 
     'sms' => [
