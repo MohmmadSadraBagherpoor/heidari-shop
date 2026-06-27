@@ -604,7 +604,7 @@ class OrderResource extends Resource
 
                         $product = Product::find($record->prd_id);
 
-                        $baleResult = app(\App\Services\BaleService::class)->sendOrder([
+                        $telegramResult = app(\App\Services\TelegramService::class)->sendOrder([
                             'order_id' => $record->id,
                             'order_code' => $record->order_code,
                             'full_name' => $record->full_name,
@@ -614,24 +614,37 @@ class OrderResource extends Resource
                             'qty' => $record->prd_qty,
                             'total' => number_format($record->total_price),
                             'shipping' => $record->shipping_method,
-                            'addons' => $record->order_caption ?? [],
+                            'addons' => is_string($record->order_caption)
+                                ? json_decode($record->order_caption, true) ?? []
+                                : ($record->order_caption ?? []),
                             'images' => $record->receipt_images ?? [],
                         ]);
 
-                        if (!empty($baleResult['message_id'])) {
+                        if (!empty($telegramResult['message_id'])) {
                             $record->update([
-                                'bale_message_id' => $baleResult['message_id'],
-                                'bale_chat_id' => $baleResult['chat_id'] ?? null,
+                                'msg_id' => $telegramResult['message_id'],
+                                'chat_id' => $telegramResult['chat_id'] ?? null,
                             ]);
                         }
 
-                        app(\App\Services\SmsService::class)->send(
-                            $record->phone,
-                            "سفارش شما با موفقیت ثبت شد ✅\n\n"
-                            . "ممنون از اعتمادتون 💚\n\n"
-                            . "کد سفارش: {$record->order_code}\n\n"
-                            . "تجهیزات پی آر پی 🧪"
-                        );
+                        $isTehran = (int)$record->province_id === 8;
+
+                        if ($isTehran) {
+                            $smsText = "سفارش شما با موفقیت ثبت شد ✅\n"
+                                . "ممنون از اعتمادتون 💚\n"
+                                . "بزودی جهت ارسال باهاتون تماس میگیریم 📞\n"
+                                . "کد سفارش: {$record->order_code}\n"
+                                . "تجهیزات پی آر پی 🧪";
+                        } else {
+                            $smsText = "سفارش شما با موفقیت ثبت شد ✅\n"
+                                . "ممنون از اعتمادتون 💚\n"
+                                . "کد سفارش: {$record->order_code}\n"
+                                . "تجهیزات پی آر پی 🧪";
+                        }
+
+                        app(\App\Services\SmsService::class)->send($record->phone, $smsText);
+
+                        app(\App\Services\TelegramService::class)->sendToConfirmedChannel($record);
                     })
                     ->visible(fn(Order $record) => $record->status === 'processing'),
 

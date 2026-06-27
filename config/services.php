@@ -18,10 +18,6 @@ return [
         'token' => env('POSTMARK_TOKEN'),
     ],
 
-    'telegram' => [
-        'bot_token' => env('TELEGRAM_BOT_TOKEN'),
-    ],
-
     'resend' => [
         'key' => env('RESEND_KEY'),
     ],
@@ -39,10 +35,10 @@ return [
         ],
     ],
 
-    'bale' => [
-        'token' => env('BALE_BOT_TOKEN'),
-        'chat_id' => env('BALE_CHAT_ID'),
-        'confirmed_chat_id' => env('BALE_CONFIRMED_CHAT_ID'),
+    'telegram' => [
+        'token'              => env('TELEGRAM_BOT_TOKEN'),
+        'chat_id'            => env('TELEGRAM_CHAT_ID'),
+        'confirmed_chat_id'  => env('TELEGRAM_CONFIRMED_CHAT_ID'),
     ],
 
     'sms' => [

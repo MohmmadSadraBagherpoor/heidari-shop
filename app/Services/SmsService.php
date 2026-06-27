@@ -29,7 +29,6 @@ class SmsService
 
         $result = $response->json();
 
-        // اگه Value عدد مثبت بود یعنی موفق بوده
         return isset($result['Value']) && (int)$result['Value'] > 0;
     }
 }

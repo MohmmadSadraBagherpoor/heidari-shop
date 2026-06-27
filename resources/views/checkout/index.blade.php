@@ -869,7 +869,7 @@
 
 <div id="pwa-install-banner" class="pwa-install-banner">
     <div class="pwa-install-content">
-        <img src="{{ asset('icon/pwa-192.png') }}" alt="App" class="pwa-app-icon">
+        <img src="{{ asset('icon/PRP_192x192.png') }}" alt="App" class="pwa-app-icon">
         <div class="pwa-app-info">
             <div class="pwa-app-title">تجهیزات پی آر پی</div>
             <div class="pwa-app-desc">نصب اپلیکیشن برای دسترسی سریع‌تر</div>
@@ -2267,8 +2267,7 @@
 
     function buildDayOptions() {
         const dropdown = document.getElementById('day-dropdown');
-        console.log('day-dropdown:', dropdown);
-        console.log('available days:', getAvailableDays());
+
         if (!dropdown) return;
 
         dropdown.innerHTML = '';

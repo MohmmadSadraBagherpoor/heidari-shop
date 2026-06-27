@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Models\Order;
 use Illuminate\Support\Facades\Http;
 
-class BaleService
+class TelegramService
 {
     private string $token;
     private string $chatId;
@@ -13,9 +13,9 @@ class BaleService
 
     public function __construct()
     {
-        $this->token = config('services.bale.token');
-        $this->chatId = config('services.bale.chat_id');
-        $this->confirmedChatId = config('services.bale.confirmed_chat_id');
+        $this->token = config('services.telegram.token');
+        $this->chatId = config('services.telegram.chat_id');
+        $this->confirmedChatId = config('services.telegram.confirmed_chat_id');
     }
 
     // متد اول: ارسال سفارش جدید با دکمه تایید/رد
@@ -52,7 +52,7 @@ class BaleService
                 'photo',
                 file_get_contents(storage_path('app/public/' . $data['images'][0])),
                 'receipt.jpg'
-            )->post("https://tapi.bale.ai/bot{$this->token}/sendPhoto", [
+            )->post("https://api.telegram.org/bot{$this->token}/sendPhoto", [
                 'chat_id' => $this->chatId,
                 'caption' => $caption,
                 'reply_markup' => json_encode($keyboard),
@@ -93,7 +93,7 @@ class BaleService
             $multipart[] = ['name' => 'media', 'contents' => json_encode($media)];
 
             $response = Http::asMultipart()->post(
-                "https://tapi.bale.ai/bot{$this->token}/sendMediaGroup",
+                "https://api.telegram.org/bot{$this->token}/sendMediaGroup",
                 $multipart
             );
 
@@ -101,7 +101,7 @@ class BaleService
             $lastMessageId = end($messages)['message_id'] ?? null;
 
             if ($lastMessageId) {
-                Http::post("https://tapi.bale.ai/bot{$this->token}/editMessageReplyMarkup", [
+                Http::post("https://api.telegram.org/bot{$this->token}/editMessageReplyMarkup", [
                     'chat_id' => $this->chatId,
                     'message_id' => $lastMessageId,
                     'reply_markup' => json_encode($keyboard),
@@ -115,41 +115,86 @@ class BaleService
         }
     }
 
-    // متد دوم: ارسال به چنل تایید شده‌ها بدون دکمه
+    // متد دوم: ارسال به چنل تایید شده‌ها
     public function sendToConfirmedChannel(Order $order): void
     {
-        $text = "✅ سفارش تایید شده\n\n";
-        $text .= "👤 نام: {$order->full_name}\n";
-        $text .= "📱 موبایل: {$order->phone}\n";
-        $text .= "📍 آدرس: {$order->address}\n";
-        $text .= "🔑 کد سفارش: {$order->order_code}\n";
-        $text .= "💰 مبلغ: " . number_format($order->total_price) . " تومان\n";
-        $text .= "🚚 روش ارسال: {$order->shipping_method}\n";
+        $isTehran = (int)$order->province_id === 8;
 
-        Http::post("https://tapi.bale.ai/bot{$this->token}/sendMessage", [
+        if ($isTehran) {
+            $text = "❌ تهران ❌\n";
+            $text .= "روش ارسال: {$order->shipping_method}\n";
+
+            if (!empty($order->shipping_time)) {
+                $text .= "بازه زمانی ارسال: {$order->shipping_time}\n";
+            }
+
+            $text .= "\n{$order->address}\n";
+            $text .= "{$order->full_name}\n";
+            $text .= "{$order->phone}\n";
+        } else {
+            // نام استان و شهر از رابطه
+            $provinceName = optional($order->province)->title ?? '';
+            $cityName = optional($order->city)->title ?? '';
+
+            $text = "{$provinceName} {$cityName}\n";
+            $text .= "{$order->address}\n";
+            $text .= "{$order->full_name}\n";
+            $text .= "{$order->phone}\n";
+        }
+
+        // محصول اصلی
+        $productLine = optional($order->product)->name ?? 'محصول';
+        $text .= "\n{$order->prd_qty} بسته {$productLine}\n";
+
+        // محصولات مکمل
+        if (!empty($order->order_caption)) {
+            $addons = is_string($order->order_caption)
+                ? json_decode($order->order_caption, true)
+                : $order->order_caption;
+
+            if (is_array($addons)) {
+                foreach ($addons as $addon) {
+                    $text .= "{$addon['qty']} عدد {$addon['name']}\n";
+                }
+            }
+        }
+
+        Http::post("https://api.telegram.org/bot{$this->token}/sendMessage", [
             'chat_id' => $this->confirmedChatId,
             'text' => $text,
         ]);
     }
 
-    public function editCaption(string $chatId, string $messageId, string $text): void
+    // ادیت پیام اصلی: حذف دکمه‌ها و ادیت کپشن/متن
+    public function editMessageAfterAction(string $chatId, string $messageId, string $statusText): void
     {
-        Http::post("https://tapi.bale.ai/bot{$this->token}/editMessageReplyMarkup", [
+        // حذف inline keyboard
+        Http::post("https://api.telegram.org/bot{$this->token}/editMessageReplyMarkup", [
             'chat_id' => $chatId,
             'message_id' => $messageId,
             'reply_markup' => json_encode(['inline_keyboard' => []]),
         ]);
 
-        Http::post("https://tapi.bale.ai/bot{$this->token}/sendMessage", [
+        // ادیت کپشن (برای پیام‌های با عکس)
+        $captionResponse = Http::post("https://api.telegram.org/bot{$this->token}/editMessageCaption", [
             'chat_id' => $chatId,
-            'text' => $text,
-            'reply_to_message_id' => $messageId,
+            'message_id' => $messageId,
+            'caption' => $statusText,
         ]);
+
+        // اگه پیام متنی بود (نه عکس)، editMessageText رو امتحان کن
+        if (!$captionResponse->json('ok')) {
+            Http::post("https://api.telegram.org/bot{$this->token}/editMessageText", [
+                'chat_id' => $chatId,
+                'message_id' => $messageId,
+                'text' => $statusText,
+            ]);
+        }
     }
 
     public function answerCallback(string $callbackQueryId, string $text): void
     {
-        Http::post("https://tapi.bale.ai/bot{$this->token}/answerCallbackQuery", [
+        Http::post("https://api.telegram.org/bot{$this->token}/answerCallbackQuery", [
             'callback_query_id' => $callbackQueryId,
             'text' => $text,
         ]);
@@ -157,7 +202,7 @@ class BaleService
 
     public function setWebhook(string $url): void
     {
-        Http::post("https://tapi.bale.ai/bot{$this->token}/setWebhook", [
+        Http::post("https://api.telegram.org/bot{$this->token}/setWebhook", [
             'url' => $url,
         ]);
     }
