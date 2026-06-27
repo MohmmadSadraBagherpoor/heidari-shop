@@ -24,7 +24,7 @@ class SendConfirmedOrderNotification implements ShouldQueue
 
     public function handle(): void
     {
-        $isTehran = (int) $this->order->province_id === 8;
+        $isTehran = (int) $this->order->city_id === 360;
 
         if ($isTehran) {
             $smsText = "سفارش شما با موفقیت ثبت شد ✅\n"

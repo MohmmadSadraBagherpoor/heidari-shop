@@ -118,7 +118,7 @@ class TelegramService
     // متد دوم: ارسال به چنل تایید شده‌ها
     public function sendToConfirmedChannel(Order $order): void
     {
-        $isTehran = (int)$order->province_id === 8;
+        $isTehran = (int)$order->city_id === 360;
 
         if ($isTehran) {
             $text = "❌ تهران ❌\n";

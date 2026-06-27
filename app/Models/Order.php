@@ -22,6 +22,16 @@ class Order extends Model
         'msg_id'                => 'integer',
     ];
 
+    public function province(): BelongsTo
+    {
+        return $this->belongsTo(City::class, 'province_id');
+    }
+
+    public function city(): BelongsTo
+    {
+        return $this->belongsTo(City::class, 'city_id');
+    }
+
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class, 'prd_id');
@@ -41,20 +51,20 @@ class Order extends Model
     {
         return match($this->status) {
             'processing' => 'در حال پردازش',
-            'received' => 'دریافت شده',
-            'confirmed' => 'تایید شده',
-            'rejected' => 'رد شده',
-            default => $this->status,
+            'received'   => 'دریافت شده',
+            'confirmed'  => 'تایید شده',
+            'rejected'   => 'رد شده',
+            default      => $this->status,
         };
     }
 
     public function getUserFeedbackLabelAttribute(): string
     {
         return match($this->user_feedback) {
-            'good' => 'خوب',
-            'bad' => 'بد',
+            'good'       => 'خوب',
+            'bad'        => 'بد',
             'no_comment' => 'بدون نظر',
-            default => '-',
+            default      => '-',
         };
     }
 }
