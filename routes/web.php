@@ -110,12 +110,13 @@ Route::get('/get-cities/{province}', function ($province) {
 //    dd($response->json());
 //});
 
-Route::post('/bale/webhook', [BaleWebhookController::class, 'handle']);
 
-Route::get('/bale/set-webhook', function () {
-    app(\App\Services\BaleService::class)->setWebhook(url('/bale/webhook'));
+Route::get('/telegram/set-webhook', function () {
+    app(\App\Services\TelegramService::class)->setWebhook(url('/telegram/webhook'));
     return 'webhook set!';
 });
+
+Route::post('/telegram/webhook', [\App\Http\Controllers\TelegramWebhookController::class, 'handle']);
 
 Route::get('/test-sms', function () {
     $response = Http::asForm()->post('https://rest.payamak-panel.com/api/SendSMS/SendSMS', [
