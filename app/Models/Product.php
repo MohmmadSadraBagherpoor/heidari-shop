@@ -18,10 +18,12 @@ class Product extends Model
         'price',
         'image',
         'status',
+        'discount_ends_at',
     ];
 
     protected $casts = [
         'status' => 'boolean',
+        'discount_ends_at' => 'datetime',
     ];
 
     public function orders()

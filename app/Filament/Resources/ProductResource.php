@@ -8,7 +8,6 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 
 class ProductResource extends Resource
@@ -33,7 +32,7 @@ class ProductResource extends Resource
                     ->description('مشخصات و اطلاعات کلی محصول را وارد کنید')
                     ->icon('heroicon-o-information-circle')
                     ->schema([
-                        Forms\Components\Grid::make(2)
+                        Forms\Components\Grid::make(3)
                             ->schema([
                                 Forms\Components\Grid::make(3)
                                     ->schema([
@@ -63,11 +62,21 @@ class ProductResource extends Resource
                                     ]),
                                 Forms\Components\TextInput::make('off_price')
                                     ->label('قیمت تخفیف خورده بسته')
+                                    ->reactive()
                                     ->placeholder('مثال: 500,000 تومان')
                                     ->helperText('درصورت عدم تخفیف برای محصول فیلد را خالی بگذارید.')
                                     ->prefixIcon('heroicon-o-currency-dollar')
                                     ->suffixIcon('heroicon-o-banknotes')
                                     ->maxLength(255),
+
+                                Forms\Components\DateTimePicker::make('discount_ends_at')
+                                    ->jalali()
+                                    ->label('زمان پایان تخفیف')
+                                    ->placeholder('اختیاری - فقط اگر تایمر میخواید')
+                                    ->helperText('درصورت عدم نیاز به تایمر، خالی بگذارید.')
+                                    ->prefixIcon('heroicon-o-clock')
+                                    ->native(false)
+                                    ->visible(fn(Forms\Get $get) => filled($get('off_price'))),
 
                                 Forms\Components\Select::make('type')
                                     ->label('نوع محصول')
@@ -139,8 +148,7 @@ class ProductResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->weight('bold')
-                    ->description(fn (Product $record): string =>
-                    $record->description ? \Str::limit($record->description, 50) : 'بدون توضیحات'
+                    ->description(fn(Product $record): string => $record->description ? \Str::limit($record->description, 50) : 'بدون توضیحات'
                     ),
 
                 Tables\Columns\TextColumn::make('price')
@@ -152,7 +160,7 @@ class ProductResource extends Resource
 
                 Tables\Columns\TextColumn::make('type')
                     ->label('نوع محصول')
-                    ->formatStateUsing(function ($state){
+                    ->formatStateUsing(function ($state) {
                         return $state == 'main' ? 'اصلی' : 'مکمل';
                     })
                     ->badge(),
@@ -161,12 +169,10 @@ class ProductResource extends Resource
                     ->label('موجودی')
                     ->sortable()
                     ->badge()
-                    ->color(fn ($state) =>
-                    $state > 10 ? 'success' :
+                    ->color(fn($state) => $state > 10 ? 'success' :
                         ($state > 0 ? 'warning' : 'danger')
                     )
-                    ->formatStateUsing(fn ($state) =>
-                    $state > 0 ? $state . ' عدد' : 'ناموجود'
+                    ->formatStateUsing(fn($state) => $state > 0 ? $state . ' عدد' : 'ناموجود'
                     ),
 
 

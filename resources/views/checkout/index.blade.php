@@ -854,6 +854,303 @@
             background: rgba(255, 255, 255, 0.35);
         }
 
+        /* ===== کارت سه‌ستونه تخفیف‌دار ===== */
+        .product-card-discount {
+            display: flex;
+            flex-direction: row-reverse; /* راست به چپ: عکس | ویژگی | قیمت */
+            gap: 0;
+            align-items: stretch;
+            border-radius: 16px;
+            overflow: hidden;
+            background: transparent;
+        }
+
+        /* ستون راست — عکس */
+        .pcd-image {
+            width: 200px;
+            flex-shrink: 0;
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .pcd-image img {
+            width: 100%;
+            height: 160px;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+
+        /* ستون وسط — ویژگی‌ها */
+        .pcd-features {
+            flex: 1;
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pcd-features .product-title {
+            margin-bottom: 12px;
+        }
+
+        .pcd-features .features {
+            flex: 1;
+        }
+
+        /* ستون چپ — قیمت‌ها */
+        .pcd-price {
+            width: 200px;
+            flex-shrink: 0;
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            background: #f8fafc;
+            direction: rtl;
+        }
+
+        .pcd-original-price {
+            font-size: 18px;
+            color: #989DA5;
+            font-weight: 400;
+            text-decoration: line-through;
+        }
+
+        .original-box-price span {
+            font-size: 13px;
+            color: #989DA5;
+
+        }
+
+        .pcd-off-price {
+            font-size: 25px;
+            font-weight: 700;
+            color: #01496D;
+            line-height: 1.2;
+        }
+
+        .pcd-off-price span {
+            font-size: 16px;
+            font-weight: 400;
+            color: #01496D;
+        }
+
+        .pcd-savings {
+            font-size: 12px;
+            color: #359DD2;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .pcd-timer {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 5px;
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 7px 10px;
+            font-size: 0.8rem;
+            color: #856404;
+            margin-top: 8px;
+        }
+
+        .pcd-timer-display {
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        /* input تعداد داخل ستون قیمت */
+        .pcd-qty-input {
+            margin-top: 12px;
+            width: 100%;
+        }
+
+        /* دکمه ادامه داخل ستون قیمت */
+        .pcd-price .btn {
+            margin-top: 10px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .pcd-timer {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: #FBEAEA;
+            border: 1px solid #F1B8B8;
+            border-radius: 16px;
+            padding: 10px 14px;
+            font-size: 13px;
+            color: #B15959;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .pcd-timer-display {
+            font-weight: 700;
+            letter-spacing: 1px;
+            font-size: 14px;
+            color: #B15959;
+        }
+
+        .mobile-discount-card {
+            display: none;
+        }
+
+        .product-card-discount {
+            display: flex;
+        }
+
+        .features-pcd {
+
+            display: grid;
+            gap: 10px;
+            margin-bottom: 35px;
+
+        }
+
+        .pcd-price .addon-qty-controller {
+            margin-top: 12px;
+        }
+
+        /* موبایل — ستون‌ها به هم بچین */
+        @media (max-width: 640px) {
+            .pcd-original-price {
+                font-size: 14px;
+                color: #989DA5;
+                font-weight: 400;
+                text-decoration: line-through;
+            }
+
+            .original-box-price span {
+                font-size: 12px;
+                color: #989DA5;
+
+            }
+
+
+            .pcd-savings {
+                font-size: 10px;
+                color: #359DD2;
+                line-height: 14px;
+                font-weight: 600;
+                margin-top: 2px;
+            }
+
+
+            .pcd-off-price {
+                font-size: 20px;
+                font-weight: 700;
+                color: #01496D;
+                line-height: 1.2;
+            }
+
+            .pcd-off-price span {
+                font-size: 12px;
+                font-weight: 400;
+                color: #01496D;
+            }
+
+            .product-card-discount {
+                display: none;
+            }
+
+            .mobile-discount-card {
+                display: block;
+                border-radius: 20px;
+                overflow: hidden;
+                background: #fff;
+                border: 1px solid #e2e8f0;
+            }
+
+            .mdc-image {
+                padding: 20px;
+                text-align: center;
+            }
+
+            .mdc-image img {
+                height: 200px;
+                width: auto;
+                max-width: 100%;
+                object-fit: contain;
+                border-radius: 12px;
+            }
+
+            .mdc-info {
+                padding: 16px;
+            }
+
+            .mdc-info .product-title {
+                font-size: 20px;
+                font-weight: 700;
+                text-align: start;
+                margin-bottom: 14px;
+            }
+
+            .mdc-info .features {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .mdc-info .feature {
+                font-size: 13px;
+                color: #64748B;
+            }
+
+            .mdc-price-box {
+                padding: 16px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .mdc-price-box .pcd-qty-input {
+                width: 100%;
+                margin-top: 12px;
+            }
+
+            .mdc-price-box {
+                padding: 16px;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .mdc-price-row {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                gap: 12px;
+            }
+
+            .mdc-price-info {
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+            }
+
+            .mdc-price-box .pcd-qty-input {
+                width: 110px;
+                flex-shrink: 0;
+                margin-top: 0;
+            }
+
+            .mdc-price-box .pcd-timer {
+                width: 100%;
+                margin-top: 12px;
+            }
+        }
+
 
     </style>
 </head>
@@ -999,18 +1296,15 @@
                     </h1>
                 </div>
                 <div class="card">
-                    <div class="product-card">
+                    <div class="product-card" @if($mainProduct->off_price) style="display:none" @endif>
                         <input type="hidden" name="prd_id" value="{{ $mainProduct->id }}">
                         <div class="product-image">
-                            <img src="{{ asset('storage/' . $mainProduct->image) }}"
-                                 alt="{{ $mainProduct->name }}">
+                            <img src="{{ asset('storage/' . $mainProduct->image) }}" alt="{{ $mainProduct->name }}">
                         </div>
                         <div class="product-content">
                             <div class="product-title">{{ $mainProduct->name }}</div>
                             @php
-                                $features = array_filter(
-                                    array_map('trim', explode('•', $mainProduct->description))
-                                );
+                                $features = array_filter(array_map('trim', explode('•', $mainProduct->description)));
                             @endphp
                             <div class="features">
                                 @foreach($features as $feature)
@@ -1041,6 +1335,149 @@
                             </div>
                         </div>
                     </div>
+
+                    {{-- ============================================
+                         کارت سه‌ستونه تخفیف‌دار — فقط وقتی off_price داره
+                         ============================================ --}}
+                    @if($mainProduct->off_price)
+                        {{--Mobile--}}
+                        <div class="mobile-discount-card">
+
+                            {{-- باکس عکس --}}
+                            <div class="mdc-image">
+                                <img src="{{ asset('storage/' . $mainProduct->image) }}" alt="{{ $mainProduct->name }}">
+                            </div>
+
+                            {{-- باکس اسم + مشخصات --}}
+                            <div class="mdc-info">
+                                <div class="product-title">{{ $mainProduct->name }}</div>
+                                @php
+                                    $features = array_filter(array_map('trim', explode('•', $mainProduct->description)));
+                                @endphp
+                                <div class="features">
+                                    @foreach($features as $feature)
+                                        <div class="feature">
+                                            <div class="check"><img
+                                                    src="{{ asset("icon/TickCircle-Linear-32px.svg") }}"></div>
+                                            {{ $feature }}
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            {{-- باکس قیمت + تعداد + تایمر --}}
+                            <div class="mdc-price-box">
+
+                                <div class="mdc-price-row">
+                                    {{-- چپ: تعداد --}}
+                                    <input type="number"
+                                           inputmode="numeric"
+                                           pattern="[0-9]*"
+                                           id="qty-mobile"
+                                           class="qty-input pcd-qty-input"
+                                           placeholder="تعداد را تایپ کنید ..."
+                                           oninput="changeMainQty(this.value)">
+
+                                    {{-- راست: قیمت‌ها --}}
+                                    <div class="mdc-price-info">
+                                        <div class="original-box-price">
+                                            <span
+                                                class="pcd-original-price">{{ toPersian(number_format($mainProduct->price)) }}</span>
+                                            <span>تومان</span>
+                                        </div>
+                                        <div class="pcd-off-price">
+                                            {{ toPersian(number_format($mainProduct->off_price)) }}
+                                            <span>تومان</span>
+                                        </div>
+                                        <div class="pcd-savings">
+                                            شما {{ toPersian(number_format($mainProduct->price - $mainProduct->off_price)) }}
+                                            تومان کمتر پرداخت می‌کنید!
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                @if($mainProduct->discount_ends_at && $mainProduct->discount_ends_at->isFuture())
+                                    <div class="pcd-timer" id="discount-timer-mobile">
+                                        <span>مانده تا اتمام تخفیف!</span>
+                                        <span class="pcd-timer-display" id="timer-display-mobile">--:--:--</span>
+                                    </div>
+                                @endif
+                                <button class="btn btn-primary btn-mobile-next" type="button" onclick="nextStep()">ادامه
+                                    ←
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="product-card product-card-discount">
+                            <input type="hidden" name="prd_id" value="{{ $mainProduct->id }}">
+
+                            {{-- ستون چپ: قیمت + تعداد + دکمه ادامه --}}
+                            <div class="pcd-price">
+                                <div class="original-box-price">
+                                    <span
+                                        class="pcd-original-price">{{ toPersian(number_format($mainProduct->price)) }}</span>
+                                    <span>تومان</span>
+                                </div>
+                                <div class="pcd-off-price">
+                                    {{ toPersian(number_format($mainProduct->off_price)) }}
+                                    <span>تومان</span>
+                                </div>
+                                <div class="pcd-savings">
+                                    شما {{ toPersian(number_format($mainProduct->price - $mainProduct->off_price)) }}
+                                    تومان کمتر پرداخت می‌کنید!
+                                </div>
+
+                                @if($mainProduct->discount_ends_at && $mainProduct->discount_ends_at->isFuture())
+                                    <div class="pcd-timer" id="discount-timer">
+                                        <span>مانده تا اتمام تخفیف!</span>
+                                        <span class="pcd-timer-display" id="timer-display">--:--:--</span>
+                                    </div>
+                                @endif
+
+
+                            </div>
+
+                            {{-- ستون وسط: عنوان + ویژگی‌ها --}}
+                            <div class="pcd-features">
+                                <div class="product-title">{{ $mainProduct->name }}</div>
+                                @php
+                                    $features = array_filter(array_map('trim', explode('•', $mainProduct->description)));
+                                @endphp
+                                <div class="features-pcd">
+                                    @foreach($features as $feature)
+                                        <div class="feature">
+                                            <div class="check"><img
+                                                    src="{{ asset("icon/TickCircle-Linear-32px.svg") }}"></div>
+                                            {{ $feature }}
+                                        </div>
+                                    @endforeach
+                                </div>
+                                <input type="number"
+                                       inputmode="numeric"
+                                       pattern="[0-9]*"
+                                       id="qty-mobile"
+                                       class="qty-input pcd-qty-input"
+                                       placeholder="تعداد را تایپ کنید ..."
+                                       oninput="changeMainQty(this.value)">
+
+                            </div>
+
+                            {{-- ستون راست: عکس --}}
+                            <div class="pcd-image">
+                                <img src="{{ asset('storage/' . $mainProduct->image) }}" alt="{{ $mainProduct->name }}">
+                            </div>
+                            <button class="btn btn-primary btn-mobile-next" type="button" onclick="nextStep()">ادامه
+                                ←
+                            </button>
+
+                        </div>
+                    @endif
                 </div>
             </div>
 
@@ -1051,7 +1488,9 @@
                         <p class="subtitle">آیا به محصول مکمل نیز نیاز دارید؟ در صورت الزام، تعداد را مشخص کنید.</p>
                     </div>
                     <div class="card">
-                        <div class="product-card">
+
+                        {{-- ===== کارت معمولی — فقط بدون تخفیف ===== --}}
+                        <div class="product-card" @if($addon->off_price) style="display:none" @endif>
                             <div class="product-image">
                                 <img src="{{ asset('storage/' . $addon->image) }}" alt="{{ $addon->name }}">
                             </div>
@@ -1064,8 +1503,7 @@
                                     @foreach($features as $feature)
                                         <div class="feature">
                                             <div class="check"><img
-                                                    src="{{ asset("icon/TickCircle-Linear-32px.svg") }}">
-                                            </div>
+                                                    src="{{ asset("icon/TickCircle-Linear-32px.svg") }}"></div>
                                             {{ $feature }}
                                         </div>
                                     @endforeach
@@ -1076,31 +1514,155 @@
                                             <button type="button" class="qty-btn"
                                                     onclick="changeSubQty({{ $addon->id }}, 1)">+
                                             </button>
-                                            <input
-                                                type="number"
-                                                min="1"
-                                                value="1"
-                                                name="addons[{{ $addon->id }}]"
-                                                id="sub-qty-{{ $addon->id }}"
-                                                class="qty-input addon-qty-input"
-                                                oninput="manualSubQty({{ $addon->id }}, this.value)"
-                                            >
+                                            <input type="number" min="1" value="1"
+                                                   name="addons[{{ $addon->id }}]"
+                                                   id="sub-qty-{{ $addon->id }}"
+                                                   class="qty-input addon-qty-input"
+                                                   oninput="manualSubQty({{ $addon->id }}, this.value)">
                                             <button type="button" class="qty-btn"
                                                     onclick="changeSubQty({{ $addon->id }}, -1)">−
                                             </button>
                                         </div>
                                         <div class="price">
-                                            {{ toPersian(number_format($addon->off_price ?: $addon->price)) }}
+                                            {{ toPersian(number_format($addon->price)) }}
                                             <span>تومان</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        @if($addon->off_price)
+
+                            {{-- ===== دسکتاپ: سه‌ستونه ===== --}}
+                            <div class="product-card product-card-discount">
+                                <div class="pcd-price">
+                                    <div class="original-box-price">
+                                        <span
+                                            class="pcd-original-price">{{ toPersian(number_format($addon->price)) }}</span>
+                                        <span>تومان</span>
+                                    </div>
+                                    <div class="pcd-off-price">
+                                        {{ toPersian(number_format($addon->off_price)) }}
+                                        <span>تومان</span>
+                                    </div>
+                                    <div class="pcd-savings">
+                                        شما {{ toPersian(number_format($addon->price - $addon->off_price)) }} تومان کمتر
+                                        پرداخت می‌کنید!
+                                    </div>
+
+                                    @if($addon->discount_ends_at && $addon->discount_ends_at->isFuture())
+                                        <div class="pcd-timer" id="discount-timer-{{ $addon->id }}">
+                                            <span>مانده تا اتمام تخفیف!</span>
+                                            <span class="pcd-timer-display"
+                                                  id="timer-display-{{ $addon->id }}">--:--:--</span>
+                                        </div>
+                                    @endif
+
+                                </div>
+
+                                <div class="pcd-features">
+                                    <div class="product-title">{{ $addon->name }}</div>
+                                    @php
+                                        $features = array_filter(array_map('trim', explode('•', $addon->description)));
+                                    @endphp
+                                    <div class="pcd-features">
+                                        @foreach($features as $feature)
+                                            <div class="feature">
+                                                <div class="check"><img
+                                                        src="{{ asset("icon/TickCircle-Linear-32px.svg") }}"></div>
+                                                {{ $feature }}
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    <div class="addon-qty-controller">
+                                        <button type="button" class="qty-btn"
+                                                onclick="changeSubQty({{ $addon->id }}, 1)">+
+                                        </button>
+                                        <input type="number" min="1" value="1"
+                                               id="sub-qty-mobile-{{ $addon->id }}"
+                                               class="qty-input addon-qty-input"
+                                               oninput="manualSubQty({{ $addon->id }}, this.value)">
+                                        <button type="button" class="qty-btn"
+                                                onclick="changeSubQty({{ $addon->id }}, -1)">−
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="pcd-image">
+                                    <img src="{{ asset('storage/' . $addon->image) }}" alt="{{ $addon->name }}">
+                                </div>
+                            </div>
+
+                            {{-- ===== موبایل: سه باکس عمودی ===== --}}
+                            <div class="mobile-discount-card">
+
+                                <div class="mdc-image">
+                                    <img src="{{ asset('storage/' . $addon->image) }}" alt="{{ $addon->name }}">
+                                </div>
+
+                                <div class="mdc-info">
+                                    <div class="product-title">{{ $addon->name }}</div>
+                                    @php
+                                        $features = array_filter(array_map('trim', explode('•', $addon->description)));
+                                    @endphp
+                                    <div class="features">
+                                        @foreach($features as $feature)
+                                            <div class="feature">
+                                                <div class="check"><img
+                                                        src="{{ asset("icon/TickCircle-Linear-32px.svg") }}"></div>
+                                                {{ $feature }}
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                <div class="mdc-price-box">
+                                    <div class="mdc-price-row">
+                                        <div class="addon-qty-controller">
+                                            <button type="button" class="qty-btn"
+                                                    onclick="changeSubQty({{ $addon->id }}, 1)">+
+                                            </button>
+                                            <input type="number" min="1" value="1"
+                                                   id="sub-qty-mobile-{{ $addon->id }}"
+                                                   class="qty-input addon-qty-input"
+                                                   oninput="manualSubQty({{ $addon->id }}, this.value)">
+                                            <button type="button" class="qty-btn"
+                                                    onclick="changeSubQty({{ $addon->id }}, -1)">−
+                                            </button>
+                                        </div>
+                                        <div class="mdc-price-info">
+                                            <div class="original-box-price">
+                                                <span
+                                                    class="pcd-original-price">{{ toPersian(number_format($addon->price)) }}</span>
+                                                <span>تومان</span>
+                                            </div>
+                                            <div class="pcd-off-price">
+                                                {{ toPersian(number_format($addon->off_price)) }}
+                                                <span>تومان</span>
+                                            </div>
+                                            <div class="pcd-savings">
+                                                شما {{ toPersian(number_format($addon->price - $addon->off_price)) }}
+                                                تومان کمتر پرداخت می‌کنید!
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @if($addon->discount_ends_at && $addon->discount_ends_at->isFuture())
+                                        <div class="pcd-timer" id="discount-timer-mobile-{{ $addon->id }}">
+                                            <span>مانده تا اتمام تخفیف!</span>
+                                            <span class="pcd-timer-display" id="timer-display-mobile-{{ $addon->id }}">--:--:--</span>
+                                        </div>
+                                    @endif
+                                </div>
+
+                            </div>
+
+                        @endif
+
                     </div>
 
                     <div class="actions addon-actions-bar">
-                        <!-- بازگشت دسکتاپ - سمت راست -->
                         <div class="addon-right-action desktop-back">
                             <button class="btn btn-back-text" type="button" onclick="prevStep()">بازگشت →</button>
                         </div>
@@ -1111,7 +1673,6 @@
                                 افزودن به سفارش
                             </button>
                         </div>
-                        <!-- بازگشت موبایل - پایین -->
                         <div class="addon-right-action mobile-back">
                             <button class="btn btn-back-text" type="button" onclick="prevStep()">بازگشت →</button>
                         </div>
@@ -1625,6 +2186,102 @@
 </form>
 
 <script>
+
+    @if($mainProduct->off_price && $mainProduct->discount_ends_at && $mainProduct->discount_ends_at->isFuture())
+    (function () {
+        const endTime = new Date("{{ $mainProduct->discount_ends_at->toIso8601String() }}").getTime();
+
+        function tick() {
+            const diff = endTime - Date.now();
+            const desktopEl = document.getElementById('timer-display');
+            const mobileEl = document.getElementById('timer-display-mobile');
+
+            if (diff <= 0) {
+                const d1 = document.getElementById('discount-timer');
+                const d2 = document.getElementById('discount-timer-mobile');
+                if (d1) d1.style.display = 'none';
+                if (d2) d2.style.display = 'none';
+                return;
+            }
+
+            const h = Math.floor(diff / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            const pad = n => String(n).padStart(2, '0');
+            const text = `${pad(s)} : ${pad(m)} : ${pad(h)}`;
+
+            if (desktopEl) desktopEl.textContent = text;
+            if (mobileEl) mobileEl.textContent = text;
+        }
+
+        tick();
+        setInterval(tick, 1000);
+    })();
+    @endif
+
+        @foreach($addOns as $addon)
+        @if($addon->off_price && $addon->discount_ends_at && $addon->discount_ends_at->isFuture())
+    (function () {
+        const endTime = new Date("{{ $addon->discount_ends_at->toIso8601String() }}").getTime();
+        const timerEl = document.getElementById('pcd-timer-display-{{ $addon->id }}');
+        if (!timerEl) return;
+
+        function tick() {
+            const diff = endTime - Date.now();
+            if (diff <= 0) {
+                const box = document.getElementById('pcd-timer-{{ $addon->id }}');
+                if (box) box.style.display = 'none';
+                return;
+            }
+            const h = Math.floor(diff / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            const pad = n => String(n).padStart(2, '0');
+            timerEl.textContent = `${pad(h)} : ${pad(m)} : ${pad(s)}`;
+        }
+
+        tick();
+        setInterval(tick, 1000);
+    })();
+    @endif
+        @endforeach
+
+        @foreach($addOns as $addon)
+        @if($addon->off_price && $addon->discount_ends_at && $addon->discount_ends_at->isFuture())
+    (function () {
+        const endTime = new Date("{{ $addon->discount_ends_at->toIso8601String() }}").getTime();
+
+        function tick() {
+            const diff = endTime - Date.now();
+            const d1 = document.getElementById('timer-display-{{ $addon->id }}');
+            const d2 = document.getElementById('timer-display-mobile-{{ $addon->id }}');
+
+            if (diff <= 0) {
+                const b1 = document.getElementById('discount-timer-{{ $addon->id }}');
+                const b2 = document.getElementById('discount-timer-mobile-{{ $addon->id }}');
+                if (b1) b1.style.display = 'none';
+                if (b2) b2.style.display = 'none';
+                return;
+            }
+
+            const h = Math.floor(diff / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            const pad = n => String(n).padStart(2, '0');
+            const text = `${pad(s)} : ${pad(m)} : ${pad(h)}`;
+
+            if (d1) d1.textContent = text;
+            if (d2) d2.textContent = text;
+        }
+
+        tick();
+        setInterval(tick, 1000);
+    })();
+    @endif
+    @endforeach
+
+
+
     document.addEventListener('DOMContentLoaded', function () {
         try {
             buildDayOptions();
@@ -1694,7 +2351,12 @@
     function changeMainQty(value) {
         let val = parseInt(value);
         mainQty = (isNaN(val) || val < 1) ? '' : val;
-        document.getElementById('qty').value = mainQty;
+
+        const qtyDesktop = document.getElementById('qty');
+        const qtyMobile = document.getElementById('qty-mobile');
+        if (qtyDesktop) qtyDesktop.value = mainQty;
+        if (qtyMobile) qtyMobile.value = mainQty;
+
         calculateTotalInvoice();
     }
 
@@ -1718,10 +2380,17 @@
             let newQty = sub.qty + step;
             if (newQty >= 1) {
                 sub.qty = newQty;
-                document.getElementById(`sub-qty-${id}`).value = newQty;
+                syncSubQtyInputs(id, newQty);
                 calculateTotalInvoice();
             }
         }
+    }
+
+    function syncSubQtyInputs(id, qty) {
+        const main = document.getElementById(`sub-qty-${id}`);
+        const mobile = document.getElementById(`sub-qty-mobile-${id}`);
+        if (main) main.value = qty;
+        if (mobile) mobile.value = qty;
     }
 
     function calculateTotalInvoice() {
@@ -2604,7 +3273,7 @@
             let qty = parseInt(value);
             if (isNaN(qty) || qty < 0) qty = 0;
             sub.qty = qty;
-            document.getElementById(`sub-qty-${id}`).value = qty;
+            syncSubQtyInputs(id, qty);
             calculateTotalInvoice();
         }
     }
