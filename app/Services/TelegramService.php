@@ -29,17 +29,21 @@ class TelegramService
         $qty        = $data['qty'];
         $productName = $data['product'];
 
-        $caption = "🧾 فاکتور سفارش\n";
+        $caption = "🧾 فاکتور سفارش";
+        $caption = "\n\n";
         $caption .= "🧪 {$qty} بسته {$productName}\n";
         $caption .= "💸 قیمت هر بسته: {$unitPrice} تومان\n";
+        $caption = "\n\n";
         $caption .= "💰 مبلغ نهایی کل سفارش: {$totalPrice} تومان";
 
         // --- متن آدرس ---
         $isTehran = (int)$data['city_id'] === 360;
 
+        $shiping = $data['shipping'] == 'tipax' ? "ارسال با تیپاکس" : "ارسال با اسنپ(امروز)";
+
         if ($isTehran) {
             $addressText = "❌ تهران ❌\n";
-            $addressText .= "روش ارسال: {$data['shipping']}\n";
+            $addressText .= "روش ارسال: {$shiping}\n";
             if (!empty($data['shipping_time'])) {
                 $addressText .= "بازه زمانی ارسال: {$data['shipping_time']}\n";
             }
@@ -47,9 +51,14 @@ class TelegramService
             $addressText = "{$data['province']} {$data['city']}\n";
         }
 
-        $addressText .= "\n{$data['address']}\n";
+        $parts = explode(' - ', $data['address']);
+        $finalAddress = implode(' - ', array_slice($parts, 2));
+        $phone = preg_replace('/^0/', '+98', $data['phone']);
+
+
+        $addressText .= "\n{$finalAddress}\n";
         $addressText .= "{$data['full_name']}\n";
-        $addressText .= "{$data['phone']}\n\n";
+        $addressText .= "{$phone}\n\n";
         $addressText .= "{$qty} بسته {$productName}\n";
 
         if (!empty($data['addons'])) {
@@ -124,9 +133,12 @@ class TelegramService
     {
         $isTehran = (int)$order->city_id === 360;
 
+        $shiping = $order->shipping_method == 'tipax' ? "ارسال با تیپاکس" : "ارسال با اسنپ(امروز)";
+
+
         if ($isTehran) {
             $text  = "❌ تهران ❌\n";
-            $text .= "روش ارسال: {$order->shipping_method}\n";
+            $text .= "روش ارسال: {$shiping}\n";
             if (!empty($order->shipping_time)) {
                 $text .= "بازه زمانی ارسال: {$order->shipping_time}\n";
             }
@@ -136,9 +148,13 @@ class TelegramService
             $text = "{$provinceName} {$cityName}\n";
         }
 
-        $text .= "\n{$order->address}\n";
+        $parts = explode(' - ', $order->address);
+        $finalAddress = implode(' - ', array_slice($parts, 2));
+        $phone = preg_replace('/^0/', '+98', $order->phone);
+
+        $text .= "\n{$finalAddress}\n";
         $text .= "{$order->full_name}\n";
-        $text .= "{$order->phone}\n\n";
+        $text .= "{$phone}\n\n";
         $text .= "{$order->prd_qty} بسته " . (optional($order->product)->name ?? 'محصول') . "\n";
 
         if (!empty($order->order_caption)) {

@@ -2321,6 +2321,37 @@
         5: {subSteps: 1, currentSub: 1}
     };
 
+    const DEFAULT_CARD = {
+        number: '۶۰۳۷۹۹۱۸۵۰۰۰۱۲۳۴',
+        numberEn: '6037991850001234',
+        bank: 'بانک صادرات',
+        owner: 'محمدرسول حیدری',
+    };
+
+    const SECOND_CARD = {
+        number: '۶۰۳۷۶۹۷۶۹۸۴۸۴۴۰۶',
+        numberEn: '6037697698484406',
+        bank: 'بانک صادرات',
+        owner: 'محمد مهدی خبیری',
+    };
+
+    function updateCardInfo(totalSum) {
+        const card = totalSum > 10000000 ? SECOND_CARD : DEFAULT_CARD;
+
+        // دسکتاپ
+        document.querySelector('.card-number-value').textContent = card.number;
+        document.querySelector('.bank-name').textContent = `(${card.bank} - ${card.owner})`;
+
+        // موبایل
+        document.querySelector('.mob-card-num').textContent = card.number;
+        document.querySelector('.mob-bank').textContent = `(${card.bank} - ${card.owner})`;
+
+        // دکمه‌های کپی
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.setAttribute('onclick', `copyCardNumber('${card.numberEn}')`);
+        });
+    }
+
     let currentStep = 1;
     let mainProductPrice = {{ $mainProduct->price }};
     let mainQty = 1;
@@ -2455,6 +2486,8 @@
         document.getElementById('final-payable-amount').textContent = formatMoney(totalSum);
         const mobileAmount = document.getElementById('final-payable-amount-mobile');
         if (mobileAmount) mobileAmount.textContent = formatMoney(totalSum);
+
+        updateCardInfo(totalSum);
     }
 
     function changeInvoiceMainQty(step) {
