@@ -30,10 +30,10 @@ class TelegramService
         $productName = $data['product'];
 
         $caption = "🧾 فاکتور سفارش";
-        $caption = "\n\n";
+        $caption .= "\n\n";
         $caption .= "🧪 {$qty} بسته {$productName}\n";
         $caption .= "💸 قیمت هر بسته: {$unitPrice} تومان\n";
-        $caption = "\n\n";
+        $caption .= "\n\n";
         $caption .= "💰 مبلغ نهایی کل سفارش: {$totalPrice} تومان";
 
         // --- متن آدرس ---
