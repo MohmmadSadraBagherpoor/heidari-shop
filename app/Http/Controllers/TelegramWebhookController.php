@@ -19,32 +19,25 @@ class TelegramWebhookController extends Controller
             return response('ok');
         }
 
-        $callbackQuery  = $data['callback_query'];
-        $callbackData   = $callbackQuery['data'];
-        $messageId      = $callbackQuery['message']['message_id'];
-        $chatId         = $callbackQuery['message']['chat']['id'];
+        $callbackQuery = $data['callback_query'];
+        $callbackData = $callbackQuery['data'];
+        $messageId = $callbackQuery['message']['message_id'];
+        $chatId = $callbackQuery['message']['chat']['id'];
         $callbackQueryId = $callbackQuery['id'];
 
         $telegram = app(TelegramService::class);
 
         if (str_starts_with($callbackData, 'approve_')) {
             $orderId = str_replace('approve_', '', $callbackData);
-            $order   = Order::find($orderId);
+            $order = Order::find($orderId);
 
             if ($order) {
                 $order->update([
-                    'status'                => 'confirmed',
+                    'status' => 'confirmed',
                     'confirmed_rejected_at' => now(),
                 ]);
 
-                // ادیت همون پیام اصلی: حذف دکمه‌ها + نوشتن وضعیت
-                $telegram->editMessageAfterAction(
-                    (string) $chatId,
-                    (string) $messageId,
-                    "✅ این سفارش تایید شد"
-                );
-
-                $telegram->answerCallback($callbackQueryId, 'سفارش تایید شد ✅');
+                $telegram->handleApprove($chatId, $messageId, $callbackQueryId, $order);
 
                 SendConfirmedOrderNotification::dispatch($order);
             }
@@ -52,21 +45,15 @@ class TelegramWebhookController extends Controller
 
         if (str_starts_with($callbackData, 'reject_')) {
             $orderId = str_replace('reject_', '', $callbackData);
-            $order   = Order::find($orderId);
+            $order = Order::find($orderId);
 
             if ($order) {
                 $order->update([
-                    'status'                => 'rejected',
+                    'status' => 'rejected',
                     'confirmed_rejected_at' => now(),
                 ]);
 
-                $telegram->editMessageAfterAction(
-                    (string) $chatId,
-                    (string) $messageId,
-                    "❌ این سفارش رد شد"
-                );
-
-                $telegram->answerCallback($callbackQueryId, 'سفارش رد شد ❌');
+                $telegram->handleReject($chatId, $messageId, $callbackQueryId);
             }
         }
 

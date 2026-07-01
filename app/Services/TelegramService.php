@@ -13,140 +13,134 @@ class TelegramService
 
     public function __construct()
     {
-        $this->token = config('services.telegram.token');
-        $this->chatId = config('services.telegram.chat_id');
+        $this->token           = config('services.telegram.token');
+        $this->chatId          = config('services.telegram.chat_id');
         $this->confirmedChatId = config('services.telegram.confirmed_chat_id');
     }
 
-    // متد اول: ارسال سفارش جدید با دکمه تایید/رد
+    // ==========================================
+    // ۱. ارسال سفارش جدید
+    // ==========================================
     public function sendOrder(array $data): array
     {
-        $caption = "🛒 سفارش جدید\n\n";
-        $caption .= "👤 نام: {$data['full_name']}\n";
-        $caption .= "📱 موبایل: {$data['phone']}\n";
-        $caption .= "📍 آدرس: {$data['address']}\n";
-        $caption .= "📦 محصول اصلی: {$data['product']} × {$data['qty']}\n";
+        // --- کپشن فاکتور ---
+        $unitPrice  = number_format($data['unit_price']);
+        $totalPrice = number_format($data['total_price']);
+        $qty        = $data['qty'];
+        $productName = $data['product'];
+
+        $caption = "🧾 فاکتور سفارش\n";
+        $caption .= "🧪 {$qty} بسته {$productName}\n";
+        $caption .= "💸 قیمت هر بسته: {$unitPrice} تومان\n";
+        $caption .= "💰 مبلغ نهایی کل سفارش: {$totalPrice} تومان";
+
+        // --- متن آدرس ---
+        $isTehran = (int)$data['city_id'] === 360;
+
+        if ($isTehran) {
+            $addressText = "❌ تهران ❌\n";
+            $addressText .= "روش ارسال: {$data['shipping']}\n";
+            if (!empty($data['shipping_time'])) {
+                $addressText .= "بازه زمانی ارسال: {$data['shipping_time']}\n";
+            }
+        } else {
+            $addressText = "{$data['province']} {$data['city']}\n";
+        }
+
+        $addressText .= "\n{$data['address']}\n";
+        $addressText .= "{$data['full_name']}\n";
+        $addressText .= "{$data['phone']}\n\n";
+        $addressText .= "{$qty} بسته {$productName}\n";
 
         if (!empty($data['addons'])) {
-            $caption .= "\n🔸 محصولات مکمل:\n";
             foreach ($data['addons'] as $addon) {
-                $caption .= "  - {$addon['name']} × {$addon['qty']}\n";
+                $addressText .= "{$addon['qty']} عدد {$addon['name']}\n";
             }
         }
 
-        $caption .= "\n💰 مبلغ کل: {$data['total']} تومان\n";
-        $caption .= "🚚 روش ارسال: {$data['shipping']}\n";
-        $caption .= "🔑 کد سفارش: {$data['order_code']}\n";
-
         $keyboard = [
-            'inline_keyboard' => [
-                [
-                    ['text' => '✅ تایید', 'callback_data' => 'approve_' . $data['order_id']],
-                    ['text' => '❌ رد', 'callback_data' => 'reject_' . $data['order_id']],
-                ]
-            ]
+            'inline_keyboard' => [[
+                ['text' => '✅ تایید', 'callback_data' => 'approve_' . $data['order_id']],
+                ['text' => '❌ رد',    'callback_data' => 'reject_'  . $data['order_id']],
+            ]]
         ];
 
+        // --- ارسال عکس(ها) بدون دکمه ---
         if (count($data['images']) === 1) {
-            $response = Http::attach(
+            Http::attach(
                 'photo',
                 file_get_contents(storage_path('app/public/' . $data['images'][0])),
                 'receipt.jpg'
             )->post("https://api.telegram.org/bot{$this->token}/sendPhoto", [
                 'chat_id' => $this->chatId,
                 'caption' => $caption,
-                'reply_markup' => json_encode($keyboard),
             ]);
-
-            return [
-                'message_id' => $response->json('result.message_id'),
-                'chat_id' => $this->chatId,
-            ];
 
         } else {
             $multipart = [];
-            $media = [];
+            $media     = [];
 
             foreach ($data['images'] as $index => $imagePath) {
                 $fileKey = 'file' . $index;
-                $isLast = $index === count($data['images']) - 1;
+                $isLast  = $index === count($data['images']) - 1;
 
-                $mediaItem = [
-                    'type' => 'photo',
-                    'media' => 'attach://' . $fileKey,
-                ];
-
-                if ($isLast) {
-                    $mediaItem['caption'] = $caption;
-                }
+                $mediaItem = ['type' => 'photo', 'media' => 'attach://' . $fileKey];
+                if ($isLast) $mediaItem['caption'] = $caption;
 
                 $media[] = $mediaItem;
-
                 $multipart[] = [
-                    'name' => $fileKey,
+                    'name'     => $fileKey,
                     'contents' => file_get_contents(storage_path('app/public/' . $imagePath)),
                     'filename' => 'receipt_' . $index . '.jpg',
                 ];
             }
 
             $multipart[] = ['name' => 'chat_id', 'contents' => $this->chatId];
-            $multipart[] = ['name' => 'media', 'contents' => json_encode($media)];
+            $multipart[] = ['name' => 'media',   'contents' => json_encode($media)];
 
-            $response = Http::asMultipart()->post(
+            Http::asMultipart()->post(
                 "https://api.telegram.org/bot{$this->token}/sendMediaGroup",
                 $multipart
             );
-
-            $messages = $response->json('result');
-            $lastMessageId = end($messages)['message_id'] ?? null;
-
-            if ($lastMessageId) {
-                Http::post("https://api.telegram.org/bot{$this->token}/editMessageReplyMarkup", [
-                    'chat_id' => $this->chatId,
-                    'message_id' => $lastMessageId,
-                    'reply_markup' => json_encode($keyboard),
-                ]);
-            }
-
-            return [
-                'message_id' => $lastMessageId,
-                'chat_id' => $this->chatId,
-            ];
         }
+
+        // --- ارسال پیام آدرس با دکمه تایید/رد ---
+        $msgResponse = Http::post("https://api.telegram.org/bot{$this->token}/sendMessage", [
+            'chat_id'      => $this->chatId,
+            'text'         => $addressText,
+            'reply_markup' => json_encode($keyboard),
+        ]);
+
+        return [
+            'message_id' => $msgResponse->json('result.message_id'),
+            'chat_id'    => $this->chatId,
+        ];
     }
 
-    // متد دوم: ارسال به چنل تایید شده‌ها
+    // ==========================================
+    // ۲. ارسال به چنل تایید شده‌ها
+    // ==========================================
     public function sendToConfirmedChannel(Order $order): void
     {
         $isTehran = (int)$order->city_id === 360;
 
         if ($isTehran) {
-            $text = "❌ تهران ❌\n";
+            $text  = "❌ تهران ❌\n";
             $text .= "روش ارسال: {$order->shipping_method}\n";
-
             if (!empty($order->shipping_time)) {
                 $text .= "بازه زمانی ارسال: {$order->shipping_time}\n";
             }
-
-            $text .= "\n{$order->address}\n";
-            $text .= "{$order->full_name}\n";
-            $text .= "{$order->phone}\n";
         } else {
-            // نام استان و شهر از رابطه
             $provinceName = optional($order->province)->title ?? '';
-            $cityName = optional($order->city)->title ?? '';
-
+            $cityName     = optional($order->city)->title    ?? '';
             $text = "{$provinceName} {$cityName}\n";
-            $text .= "{$order->address}\n";
-            $text .= "{$order->full_name}\n";
-            $text .= "{$order->phone}\n";
         }
 
-        // محصول اصلی
-        $productLine = optional($order->product)->name ?? 'محصول';
-        $text .= "\n{$order->prd_qty} بسته {$productLine}\n";
+        $text .= "\n{$order->address}\n";
+        $text .= "{$order->full_name}\n";
+        $text .= "{$order->phone}\n\n";
+        $text .= "{$order->prd_qty} بسته " . (optional($order->product)->name ?? 'محصول') . "\n";
 
-        // محصولات مکمل
         if (!empty($order->order_caption)) {
             $addons = is_string($order->order_caption)
                 ? json_decode($order->order_caption, true)
@@ -161,42 +155,51 @@ class TelegramService
 
         Http::post("https://api.telegram.org/bot{$this->token}/sendMessage", [
             'chat_id' => $this->confirmedChatId,
-            'text' => $text,
+            'text'    => $text,
         ]);
     }
 
-    // ادیت پیام اصلی: حذف دکمه‌ها و ادیت کپشن/متن
-    public function editMessageAfterAction(string $chatId, string $messageId, string $statusText): void
+    // ==========================================
+    // ۳. تایید سفارش: پیام جدید + حذف دکمه‌ها
+    // ==========================================
+    public function handleApprove(string $chatId, string $messageId, string $callbackQueryId, Order $order): void
     {
-        // حذف inline keyboard
+        // حذف دکمه‌های پیام آدرس
         Http::post("https://api.telegram.org/bot{$this->token}/editMessageReplyMarkup", [
-            'chat_id' => $chatId,
-            'message_id' => $messageId,
+            'chat_id'      => $chatId,
+            'message_id'   => $messageId,
             'reply_markup' => json_encode(['inline_keyboard' => []]),
         ]);
 
-        // ادیت کپشن (برای پیام‌های با عکس)
-        $captionResponse = Http::post("https://api.telegram.org/bot{$this->token}/editMessageCaption", [
+        // پیام تایید جدید
+        $approvedBy = "@Prphairheidari_bot";
+        Http::post("https://api.telegram.org/bot{$this->token}/sendMessage", [
             'chat_id' => $chatId,
-            'message_id' => $messageId,
-            'caption' => $statusText,
+            'text'    => "سفارش شماره {$order->order_code} توسط {$approvedBy} تایید شد. ✅",
         ]);
 
-        // اگه پیام متنی بود (نه عکس)، editMessageText رو امتحان کن
-        if (!$captionResponse->json('ok')) {
-            Http::post("https://api.telegram.org/bot{$this->token}/editMessageText", [
-                'chat_id' => $chatId,
-                'message_id' => $messageId,
-                'text' => $statusText,
-            ]);
-        }
+        $this->answerCallback($callbackQueryId, 'سفارش تایید شد ✅');
+    }
+
+    // ==========================================
+    // ۴. رد سفارش: فقط حذف دکمه‌ها
+    // ==========================================
+    public function handleReject(string $chatId, string $messageId, string $callbackQueryId): void
+    {
+        Http::post("https://api.telegram.org/bot{$this->token}/editMessageReplyMarkup", [
+            'chat_id'      => $chatId,
+            'message_id'   => $messageId,
+            'reply_markup' => json_encode(['inline_keyboard' => []]),
+        ]);
+
+        $this->answerCallback($callbackQueryId, 'سفارش رد شد ❌');
     }
 
     public function answerCallback(string $callbackQueryId, string $text): void
     {
         Http::post("https://api.telegram.org/bot{$this->token}/answerCallbackQuery", [
             'callback_query_id' => $callbackQueryId,
-            'text' => $text,
+            'text'              => $text,
         ]);
     }
 

@@ -28,17 +28,21 @@ class SendOrderNotification implements ShouldQueue
     public function handle(): void
     {
         $telegramResult = app(TelegramService::class)->sendOrder([
-            'order_id'   => $this->order->id,
-            'order_code' => $this->order->order_code,
-            'full_name'  => $this->order->full_name,
-            'phone'      => $this->order->phone,
-            'address'    => $this->order->address,
-            'product'    => $this->productName,
-            'qty'        => $this->order->prd_qty,
-            'total'      => number_format($this->order->total_price),
-            'shipping'   => $this->order->shipping_method,
-            'addons'     => $this->addons,
-            'images'     => $this->images,
+            'order_id'    => $this->order->id,
+            'order_code'  => $this->order->order_code,
+            'full_name'   => $this->order->full_name,
+            'phone'       => $this->order->phone,
+            'address'     => $this->order->address,
+            'product'     => $this->productName,
+            'qty'         => $this->order->prd_qty,
+            'total_price' => number_format($this->order->total_price),
+            'unit_price'  => $this->order->prd_price,
+            'shipping'    => $this->order->shipping_method,
+            'addons'      => $this->addons,
+            'images'      => $this->images,
+            'city_id'     => $this->order->city_id,
+            'province'    => optional($this->order->province)->title ?? '',
+            'city'        => optional($this->order->city)->title ?? '',
         ]);
 
         if (!empty($telegramResult['message_id'])) {

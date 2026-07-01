@@ -605,15 +605,20 @@ class OrderResource extends Resource
                         $product = Product::find($record->prd_id);
 
                         $telegramResult = app(\App\Services\TelegramService::class)->sendOrder([
-                            'order_id' => $record->id,
-                            'order_code' => $record->order_code,
-                            'full_name' => $record->full_name,
-                            'phone' => $record->phone,
-                            'address' => $record->address,
+                            'order_id'     => $record->id,
+                            'order_code'   => $record->order_code,
+                            'full_name'    => $record->full_name,
+                            'phone'        => $record->phone,
+                            'address'      => $record->address,
                             'product' => $product?->name,
-                            'qty' => $record->prd_qty,
-                            'total' => number_format($record->total_price),
-                            'shipping' => $record->shipping_method,
+                            'qty'          => $record->prd_qty,
+                            'unit_price'   => $record->prd_price,
+                            'total_price'  => $record->total_price,
+                            'shipping'     => $record->shipping_method,
+                            'shipping_time'=> $record->shipping_time,
+                            'city_id'      => $record->city_id,
+                            'province'     => optional($record->province)->title,
+                            'city'         => optional($record->city)->title,
                             'addons' => is_string($record->order_caption)
                                 ? json_decode($record->order_caption, true) ?? []
                                 : ($record->order_caption ?? []),
