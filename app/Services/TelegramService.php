@@ -24,8 +24,8 @@ class TelegramService
     public function sendOrder(array $data): array
     {
         // --- کپشن فاکتور ---
-        $unitPrice  = number_format($data['unit_price']);
-        $totalPrice = number_format($data['total_price']);
+        $unitPrice  = $data['unit_price'];
+        $totalPrice = $data['total_price'];
         $qty        = $data['qty'];
         $productName = $data['product'];
 
