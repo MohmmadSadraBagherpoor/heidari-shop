@@ -19,16 +19,48 @@ class SmsService
 
     public function send(string $phone, string $message): bool
     {
-        $response = Http::asForm()->post('https://rest.payamak-panel.com/api/SendSMS/SendSMS', [
-            'username' => $this->username,
-            'password' => $this->password,
-            'to' => $phone,
-            'from' => $this->sender,
-            'text' => $message,
+        \Log::info('SMS REQUEST START', [
+            'phone' => $phone,
+            'message' => $message,
         ]);
 
-        $result = $response->json();
+        try {
+            $response = Http::asForm()->post(
+                'https://rest.payamak-panel.com/api/SendSMS/SendSMS',
+                [
+                    'username' => $this->username,
+                    'password' => $this->password,
+                    'to' => $phone,
+                    'from' => $this->sender,
+                    'text' => $message,
+                ]
+            );
 
-        return isset($result['Value']) && (int)$result['Value'] > 0;
+            \Log::info('SMS API RESPONSE RAW', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
+            $result = $response->json();
+
+            \Log::info('SMS API RESPONSE JSON', [
+                'result' => $result,
+            ]);
+
+            $success = isset($result['Value']) && (int)$result['Value'] > 0;
+
+            \Log::info('SMS FINAL RESULT', [
+                'success' => $success,
+            ]);
+
+            return $success;
+
+        } catch (\Throwable $e) {
+            \Log::error('SMS EXCEPTION', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return false;
+        }
     }
 }

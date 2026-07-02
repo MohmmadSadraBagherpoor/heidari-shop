@@ -39,6 +39,8 @@ class SendOrderNotification implements ShouldQueue
             'total_price' => $this->order->total_price,
             'unit_price' => $this->order->prd_price,
             'shipping' => $this->order->shipping_method,
+            'shipping_day' => $this->order->shipping_day ?? '',
+            'shipping_time' => $this->order->shipping_time ?? '',
             'addons' => $this->addons,
             'images' => $this->images,
             'city_id' => $this->order->city_id,

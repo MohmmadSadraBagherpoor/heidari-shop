@@ -616,6 +616,7 @@ class OrderResource extends Resource
                             'total_price'  => $record->total_price,
                             'shipping'     => $record->shipping_method,
                             'shipping_time'=> $record->shipping_time,
+                            'shipping_day' => $record->shipping_day ?? '',
                             'city_id'      => $record->city_id,
                             'province'     => optional($record->province)->title,
                             'city'         => optional($record->city)->title,

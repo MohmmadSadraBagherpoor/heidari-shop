@@ -3,8 +3,8 @@
 namespace App\Jobs;
 
 use App\Models\Order;
-use App\Services\TelegramService;
 use App\Services\SmsService;
+use App\Services\TelegramService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -24,7 +24,19 @@ class SendConfirmedOrderNotification implements ShouldQueue
 
     public function handle(): void
     {
-        $isTehran = (int) $this->order->city_id === 360;
+        \Log::info('SendConfirmedOrderNotification START', [
+            'order_id' => $this->order->id,
+            'phone' => $this->order->phone,
+            'city_id' => $this->order->city_id,
+        ]);
+
+        $isTehran = (int)$this->order->city_id === 360;
+
+        \Log::info('City check', [
+            'order_id' => $this->order->id,
+            'city_id' => $this->order->city_id,
+            'is_tehran' => $isTehran,
+        ]);
 
         if ($isTehran) {
             $smsText = "سفارش شما با موفقیت ثبت شد ✅\n"
@@ -39,16 +51,42 @@ class SendConfirmedOrderNotification implements ShouldQueue
                 . "تجهیزات پی آر پی 🧪";
         }
 
-        app(SmsService::class)->send($this->order->phone, $smsText);
+        \Log::info('SMS text generated', [
+            'order_id' => $this->order->id,
+            'sms_text' => $smsText,
+        ]);
 
-        app(TelegramService::class)->sendToConfirmedChannel($this->order);
+        $smsResult = app(SmsService::class)
+            ->send($this->order->phone, $smsText);
+
+        \Log::info('SMS send result', [
+            'order_id' => $this->order->id,
+            'result' => $smsResult,
+        ]);
+
+        try {
+            app(TelegramService::class)->sendToConfirmedChannel($this->order);
+
+            \Log::info('Telegram sent successfully', [
+                'order_id' => $this->order->id,
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('Telegram failed', [
+                'order_id' => $this->order->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        \Log::info('SendConfirmedOrderNotification END', [
+            'order_id' => $this->order->id,
+        ]);
     }
 
     public function failed(\Throwable $e): void
     {
         \Log::error('SendConfirmedOrderNotification failed', [
             'order_id' => $this->order->id,
-            'error'    => $e->getMessage(),
+            'error' => $e->getMessage(),
         ]);
     }
 }

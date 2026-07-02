@@ -39,13 +39,22 @@ class TelegramService
         // --- متن آدرس ---
         $isTehran = (int)$data['city_id'] === 360;
 
-        $shiping = $data['shipping'] == 'tipax' ? "ارسال با تیپاکس" : "ارسال با اسنپ(امروز)";
+        $shipping = $data['shipping'] == 'tipax' ? "ارسال با تیپاکس" : "ارسال با اسنپ";
 
         if ($isTehran) {
             $addressText = "❌ تهران ❌\n";
-            $addressText .= "روش ارسال: {$shiping}\n";
-            if (!empty($data['shipping_time'])) {
-                $addressText .= "بازه زمانی ارسال: {$data['shipping_time']}\n";
+            $addressText .= "روش ارسال: {$shipping}";
+
+            if ($data['shipping'] !== 'tipax') {
+                if (!empty($data['shipping_day'])) {
+                    $addressText .= " ({$data['shipping_day']})";
+                }
+                $addressText .= "\n";
+                if (!empty($data['shipping_time'])) {
+                    $addressText .= "بازه زمانی ارسال: {$data['shipping_time']}\n";
+                }
+            } else {
+                $addressText .= "\n";
             }
         } else {
             $addressText = "{$data['province']} {$data['city']}\n";
