@@ -42,32 +42,32 @@ class OrderController extends Controller
     {
         $product = Product::findOrFail($request->prd_id);
 
-        // آپلود تصاویر
         $images = $this->orderService->uploadImages($request->file('images', []));
 
-        // مکمل‌ها
         [$addons, $addonsTotal] = $this->orderService->buildAddons(
             $request->input('addons', [])
         );
 
-        // DTO
         $dto = OrderDTO::fromRequest($request, $addons, $images);
 
-        // جمع کل
         $totalPrice = ($product->price * $dto->productQty) + $addonsTotal;
         $orderCode = $this->orderService->generateOrderCode();
 
-        // ثبت سفارش
         $order = $this->orderService->createOrder($dto, $product, $totalPrice, $orderCode);
 
-        // dispatch
         SendOrderNotification::dispatch($order, $addons, $images, $product->name);
+
+        $supportUsername = 'Prp_hair'; 
+        $preFilledText = "سلام، من سفارشم رو ثبت کردم\nبا کد: {$orderCode}\nاطلاعاتش رو میخوام";
+        $telegramLink = "https://t.me/{$supportUsername}?text=" . urlencode($preFilledText);
+        // ---------------------------------------------
 
         return back()->with([
             'success' => true,
             'order_id' => $orderCode,
             'order_total' => $totalPrice,
             'order_date' => \Hekmatinasser\Verta\Verta::now()->format('j F Y'),
+            'telegram_link' => $telegramLink,
         ]);
     }
 }
