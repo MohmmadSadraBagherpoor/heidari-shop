@@ -2154,6 +2154,14 @@
                 </div>
             </div>
 
+            @if(session('telegram_link'))
+                <div style="text-align: center; margin-top: 30px;">
+                    <a href="{{ session('telegram_link') }}" target="_blank" class="btn btn-primary" style="display: inline-block; padding: 14px 30px; border-radius: 30px; font-size: 17px; font-weight: bold; width: fit-content; text-decoration: none;">
+                        ارسال پیام به پشتیبانی در تلگرام
+                    </a>
+                </div>
+            @endif
+
             {{--            <div class="success-notice">--}}
             {{--                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">--}}
             {{--                    <circle cx="12" cy="12" r="10" stroke="#16a34a" stroke-width="1.5"/>--}}
