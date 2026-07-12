@@ -9,6 +9,7 @@ use App\Models\City;
 use App\Models\Product;
 use App\Services\CityService;
 use App\Services\OrderService;
+use Illuminate\Support\Facades\Http;
 
 class OrderController extends Controller
 {
@@ -57,10 +58,12 @@ class OrderController extends Controller
 
         SendOrderNotification::dispatch($order, $addons, $images, $product->name);
 
-        $supportUsername = 'Prp_hair'; 
+        $supportUsername = 'Prp_hair';
         $preFilledText = "سلام، من سفارشم رو ثبت کردم\nبا کد: {$orderCode}\nاطلاعاتش رو میخوام";
         $telegramLink = "https://t.me/{$supportUsername}?text=" . urlencode($preFilledText);
-        // ---------------------------------------------
+
+        $isIran = $this->isIranIP($request->ip());
+        $isIran = true;
 
         return back()->with([
             'success' => true,
@@ -68,6 +71,19 @@ class OrderController extends Controller
             'order_total' => $totalPrice,
             'order_date' => \Hekmatinasser\Verta\Verta::now()->format('j F Y'),
             'telegram_link' => $telegramLink,
+            'is_iran_ip' => $isIran,
         ]);
+    }
+
+    private function isIranIP(string $ip): bool
+    {
+        return cache()->remember("ip_country_{$ip}", now()->addHours(24), function () use ($ip) {
+            try {
+                $response = Http::timeout(3)->get("http://ip-api.com/json/{$ip}?fields=countryCode");
+                return $response->json('countryCode') === 'IR';
+            } catch (\Throwable) {
+                return false;
+            }
+        });
     }
 }
