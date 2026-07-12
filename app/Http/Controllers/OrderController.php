@@ -63,7 +63,6 @@ class OrderController extends Controller
         $telegramLink = "https://t.me/{$supportUsername}?text=" . urlencode($preFilledText);
 
         $isIran = $this->isIranIP($request->ip());
-        $isIran = true;
 
         return back()->with([
             'success' => true,
