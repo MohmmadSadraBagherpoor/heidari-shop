@@ -3316,12 +3316,22 @@
         });
         const mobile = document.getElementById('mobile');
         const mobileError = document.getElementById('mobile-error');
-        if (mobile.value.trim() && !/^09\d{9}$/.test(mobile.value.trim())) {
+
+        // تبدیل اعداد فارسی/عربی به انگلیسی
+        const normalizedMobile = mobile.value.trim()
+            .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d))
+            .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+
+        // مقدار input رو هم آپدیت کن
+        mobile.value = normalizedMobile;
+
+        if (normalizedMobile && !/^09\d{9}$/.test(normalizedMobile)) {
             mobile.classList.add('input-error');
             mobileError.textContent = 'شماره تماس معتبر نیست';
             mobileError.style.display = 'block';
             isValid = false;
         }
+
         return isValid;
     }
 
